@@ -1,28 +1,28 @@
 package com.example.demo
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/cars")
-class RestApiDemoController {
-    private val carList = mutableListOf<Cars>()
+class RestApiDemoController(private val carsRepository: CarsRepository) {
 
-    init {
-        carList.add(Cars("Toyota Camry", 120000, "2012"))
-        carList.add(Cars("Honda Accord", 13234, "2013"))
-        carList.add(Cars("Nissan Altima", 234987, "2014"))
-        carList.add(Cars("Ford Fusion", 234987, "2008"))
-        carList.add(Cars("Hyundai Sonata", 2345687, "2013"))
-        carList.add(Cars("Chevrolet Malibu", 256987, "2017"))
-        carList.add(Cars("Hyundai Solaris", 23593, "2011"))
-    }
+    @GetMapping
+    fun getAllCars(): Iterable<Cars> = carsRepository.findAll()
 
-    @GetMapping("/all")
-    fun getAllCars() = carList
+    @GetMapping("/{id}")
+    fun getCarById(@PathVariable id: Int) = carsRepository.findById(id)
 
-    @GetMapping("/{name}")
-    fun getCarByName(@PathVariable name: String) = carList.filter { it.name == name }
+    @PostMapping
+    fun addCar(@RequestBody car: Cars) = carsRepository.save(car)
+
+    @PutMapping("/{id}")
+    fun updateCar(@PathVariable id: Int, @RequestBody car: Cars) =
+        if (!carsRepository.existsById(id))
+            ResponseEntity(carsRepository.save(car), HttpStatus.CREATED)
+        else ResponseEntity(carsRepository.save(car), HttpStatus.OK)
+
+    @DeleteMapping("/{id}")
+    fun deleteCar(@PathVariable id: Int) = carsRepository.deleteById(id)
 }
