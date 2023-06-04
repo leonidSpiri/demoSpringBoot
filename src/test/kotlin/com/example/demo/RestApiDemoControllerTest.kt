@@ -1,5 +1,6 @@
 package com.example.demo
 
+import com.google.gson.Gson
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,7 +60,9 @@ class RestApiDemoControllerTest {
             }
         }
         webTestClient.get().uri("/cars").exchange().expectStatus().isOk.expectBody(Iterable::class.java)
-            .returnResult().responseBody?.iterator()
+            .returnResult().responseBody?.iterator()?.forEach{ cars ->
+              println(cars)
+            }
     }
 
     @Test
