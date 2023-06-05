@@ -10,7 +10,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-class RestApiDemoControllerTest {
+class CarsControllerTest {
 
     @Autowired
     lateinit var webTestClient: WebTestClient
@@ -73,8 +73,7 @@ class RestApiDemoControllerTest {
 
     @Test
     fun addCar() {
-        carsRepository.saveAll(carsArray)
-        assertEquals(carsArray.toList().toTypedArray().size.toLong(), carsRepository.count())
+
         webTestClient.post().uri("/cars")
             .bodyValue(
                 Cars(
@@ -84,7 +83,7 @@ class RestApiDemoControllerTest {
                     "Porsche is a German multinational company which produces luxury vehicles and motorcycles."
                 )
             )
-            .exchange().expectStatus().isOk
+            .exchange().expectStatus().isCreated
         assert(carsRepository.existsById(6))
         assert(carsRepository.findById(6).get().name == "Porsche")
     }
