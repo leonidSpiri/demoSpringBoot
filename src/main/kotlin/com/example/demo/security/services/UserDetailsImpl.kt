@@ -34,16 +34,16 @@ class UserDetailsImpl(
     companion object{
         @JvmStatic
         fun build(user: User): UserDetailsImpl {
-            val authorities: List<GrantedAuthority> = user.roles.stream()
-                .map { role -> SimpleGrantedAuthority(role.role.name) }
-                .collect(Collectors.toList())
+            val authorities: List<GrantedAuthority> = user.roles?.stream()
+                ?.map { role -> SimpleGrantedAuthority(role.role.name) }
+                ?.collect(Collectors.toList()) ?: emptyList()
             return UserDetailsImpl(
-                user.id,
+                user.id ?: 0,
                 user.userName,
                 user.email,
                 user.password,
                 authorities
-            )
+             )
         }
     }
 }

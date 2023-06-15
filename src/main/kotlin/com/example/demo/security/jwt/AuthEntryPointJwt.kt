@@ -21,7 +21,7 @@ class AuthEntryPointJwt : AuthenticationEntryPoint {
 
         response.contentType = MediaType.APPLICATION_JSON_VALUE
         response.status = HttpServletResponse.SC_UNAUTHORIZED
-
+        println(request.servletPath)
         val body = mutableMapOf<String, Any>()
         body["status"] = HttpServletResponse.SC_UNAUTHORIZED
         body["error"] = "Unauthorized"

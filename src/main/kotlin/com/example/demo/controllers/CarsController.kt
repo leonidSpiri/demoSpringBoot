@@ -1,15 +1,18 @@
-package com.example.demo
+package com.example.demo.controllers
 
+import com.example.demo.CarsService
 import com.example.demo.models.Cars
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.logging.Logger
 import kotlin.jvm.optionals.toList
 
+@CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
-@RequestMapping("/cars")
+@RequestMapping("/api/cars")
 class CarsController(private val carsService: CarsService) {
     val logger: Logger = Logger.getLogger(CarsController::class.java.canonicalName)
 
@@ -20,12 +23,14 @@ class CarsController(private val carsService: CarsService) {
             carList.toList().forEach { car -> logger.info("${car.id} ${car.name} ${car.price} ${car.description}") }
         }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/id/{id}")
     fun getCarById(@PathVariable id: Int) = carsService.getCarById(id)
         .also { carList ->
             carList.toList().forEach { car -> logger.info("${car.id} ${car.name} ${car.price} ${car.description}") }
         }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/info")
     @ResponseStatus(HttpStatus.OK)
     fun getInfo(@RequestHeader headers: Map<String, String>, response: HttpServletResponse) {
@@ -50,6 +55,7 @@ class CarsController(private val carsService: CarsService) {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun addCar(@RequestBody car: Cars) =
@@ -67,6 +73,7 @@ class CarsController(private val carsService: CarsService) {
         return ResponseEntity(body, status)
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteCar(@PathVariable id: Int) = carsService.deleteCar(id).also { logger.info("Car deleted") }

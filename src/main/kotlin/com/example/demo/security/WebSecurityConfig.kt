@@ -9,6 +9,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
@@ -44,20 +46,29 @@ class WebSecurityConfig(
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf { csrf -> csrf.disable() }
-            .exceptionHandling { exception ->
-                exception.authenticationEntryPoint(unauthorizedHandler)
+        http.csrf { it.disable() }
+            .exceptionHandling { exception: ExceptionHandlingConfigurer<HttpSecurity?> ->
+                exception.authenticationEntryPoint(
+                    unauthorizedHandler
+                )
             }
-            .sessionManagement { session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionManagement { session: SessionManagementConfigurer<HttpSecurity?> ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
             }
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/api/auth/**").permitAll()
-                    .requestMatchers("/api/test/**").permitAll()
-                    .requestMatchers("/cars").authenticated()
-                    .anyRequest().authenticated()
+                auth
+                    .requestMatchers("/api/cars/**").fullyAuthenticated()
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/error").permitAll()
+                    .requestMatchers("/swagger-ui/**").permitAll() //TODO set to authenticated only
+                    .requestMatchers("/v3/api-docs/**").permitAll() //TODO set to authenticated only
+                    .anyRequest().fullyAuthenticated()
             }
+
         http.authenticationProvider(authenticationProvider())
+
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
