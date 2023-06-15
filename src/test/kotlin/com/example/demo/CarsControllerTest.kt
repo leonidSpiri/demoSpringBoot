@@ -1,6 +1,7 @@
 package com.example.demo
 
-import com.google.gson.Gson
+import com.example.demo.models.Cars
+import com.example.demo.repository.CarsRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

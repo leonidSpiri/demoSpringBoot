@@ -1,5 +1,7 @@
 package com.example.demo
 
+import com.example.demo.models.Cars
+import com.example.demo.repository.CarsRepository
 import org.springframework.stereotype.Service
 import java.util.*
 

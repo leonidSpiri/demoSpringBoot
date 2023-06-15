@@ -1,5 +1,6 @@
 package com.example.demo
 
+import com.example.demo.models.Cars
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
