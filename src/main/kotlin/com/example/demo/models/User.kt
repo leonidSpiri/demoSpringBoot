@@ -14,7 +14,7 @@ import jakarta.validation.constraints.NotBlank
 class User(
 
 
-    @field:Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 

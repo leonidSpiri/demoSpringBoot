@@ -3,7 +3,9 @@ package com.example.demo.repository
 import com.example.demo.models.Cars
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
+import org.springframework.stereotype.Repository
 
+@Repository
 interface CarsRepository : CrudRepository<Cars, Int>{
 
     @Query("SELECT * FROM cars WHERE name = :name", nativeQuery = true)

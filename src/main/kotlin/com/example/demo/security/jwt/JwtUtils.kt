@@ -16,32 +16,37 @@ class JwtUtils {
     private val logger = LoggerFactory.getLogger(JwtUtils::class.java)
 
     @Value("\${example.app.jwtSecret}")
-    private val jwtSecret: String? = null
+    private val jwtSecret = ""
 
     @Value("\${example.app.jwtExpirationMs}")
     private val jwtExpirationMs = 0
 
     fun generateJwtToken(authentication: Authentication): String {
         val userPrincipal = authentication.principal as UserDetailsImpl
-        return Jwts.builder()
-            .setSubject(userPrincipal.username)
-            .setIssuedAt(Date())
-            .setExpiration(Date(Date().time + jwtExpirationMs))
-            .signWith(key(), SignatureAlgorithm.HS512)
-            .compact()
+        return generateTokenFromUsername(userPrincipal.username)
     }
+
+    fun generateTokenFromUsername(username: String) = Jwts.builder()
+        .setSubject(username)
+        .setIssuedAt(Date())
+        .setExpiration(Date(Date().time + jwtExpirationMs))
+        .signWith(key(), SignatureAlgorithm.HS512)
+        .compact()
 
     private fun key() = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret))
 
     fun getUserNameFromJwtToken(token: String?): String =
         Jwts.parserBuilder().setSigningKey(key()).build()
-        .parseClaimsJws(token).body.subject
+            .parseClaimsJws(token).body.subject
 
 
     fun validateJwtToken(authToken: String?): Boolean {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken)
             return true
+
+        } catch (e: SecurityException) {
+            logger.error("Invalid JWT signature: {}", e.message)
         } catch (e: MalformedJwtException) {
             logger.error("Invalid JWT token: {}", e.message)
         } catch (e: ExpiredJwtException) {
