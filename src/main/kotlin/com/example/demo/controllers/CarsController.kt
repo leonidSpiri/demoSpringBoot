@@ -2,6 +2,7 @@ package com.example.demo.controllers
 
 import com.example.demo.CarsService
 import com.example.demo.models.Cars
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -55,12 +56,16 @@ class CarsController(private val carsService: CarsService) {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+
+    @PreAuthorize("#request.getRemoteAddr().equals('127.0.0.1') and hasRole('ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun addCar(@RequestBody car: Cars) =
+    fun addCar(@RequestBody car: Cars, request: HttpServletRequest) =
         carsService.addCar(car)
-            .also { carRes -> logger.info("${carRes.id} ${carRes.name} ${carRes.price} ${carRes.description}") }
+            .also { carRes ->
+                logger.info("${carRes.id} ${carRes.name} ${carRes.price} ${carRes.description}")
+                logger.info(request.remoteAddr)
+            }
 
 
     @PutMapping("/{id}")
